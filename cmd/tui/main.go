@@ -3,18 +3,16 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
+
+	"mail-tui/internal/core"
+	"mail-tui/internal/ui/email_viewer"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 type model struct {
-	emails []email
-	cursor int
-}
-
-type email struct {
-	from    string
-	subject string
+	emailViewer *email_viewer.EmailViewerModel
 }
 
 func (m model) Init() tea.Cmd {
@@ -22,51 +20,54 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var (
+		commands []tea.Cmd
+		cmd      tea.Cmd
+	)
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "q":
 			return m, tea.Quit
-		case "up", "k":
-			if m.cursor > 0 {
-				m.cursor--
-			}
-		case "down", "j":
-			if m.cursor < len(m.emails)-1 {
-				m.cursor++
-			}
+		case "l":
+			commands = append(commands, func() tea.Msg {
+				// simulate loading an email
+				return email_viewer.DisplayEmailMessage{
+					Email: &core.Email{
+						From:    "from@example.com",
+						To:      "to@example.com",
+						Subject: "Test email",
+						SentAt:  time.Now(),
+						Body: "To whom it may concern,\n\n" +
+							"This is a test email.\n\n" +
+							"Yours sincerely,\n\n" +
+							"Tester",
+					},
+				}
+			})
 		}
 	}
-	return m, nil
+
+	m.emailViewer, cmd = m.emailViewer.Update(msg)
+	commands = append(commands, cmd)
+
+	return m, tea.Batch(commands...)
 }
 
 func (m model) View() string {
-	output := "Emails:\n\n"
-	for i, email := range m.emails {
-		cursor := " "
-		if m.cursor == i {
-			cursor = ">"
-		}
-		output += fmt.Sprintf("%s [%s] – %s\n", cursor, email.from, email.subject)
-	}
-	output += "\n Press q to quit.\n"
-	return output
+	return m.emailViewer.View()
 }
 
 func initialModel() model {
-	return model{
-		emails: []email{
-			{from: "test@test.com", subject: "test1"},
-			{from: "test@test.com", subject: "test2"},
-			{from: "test@test.com", subject: "test3"},
-			{from: "test@test.com", subject: "test4"},
-		},
-		cursor: 0,
-	}
+	return model{&email_viewer.EmailViewerModel{}}
 }
 
 func main() {
-	program := tea.NewProgram(initialModel())
+	program := tea.NewProgram(
+		initialModel(),
+		tea.WithAltScreen(),
+		tea.WithMouseCellMotion())
 	_, err := program.Run()
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)

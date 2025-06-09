@@ -2,7 +2,11 @@ module mail-tui
 
 go 1.24
 
-require github.com/charmbracelet/bubbletea v1.3.5
+require (
+	github.com/charmbracelet/bubbles v0.21.0
+	github.com/charmbracelet/bubbletea v1.3.5
+	github.com/muesli/reflow v0.3.0
+)
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
