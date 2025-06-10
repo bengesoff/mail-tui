@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -67,4 +68,24 @@ func (d *listItemDelegate) Render(w io.Writer, m list.Model, index int, item lis
 	}
 
 	_, _ = fmt.Fprintf(w, style("%s %s\n  %s (%s)"), selected, emailSubjectStyle.Render(email.Subject), email.From, sent)
+}
+
+func (d *listItemDelegate) ShortHelp() []key.Binding {
+	return []key.Binding{
+		key.NewBinding(
+			key.WithKeys("enter"),
+			key.WithHelp("enter", "view email"),
+		),
+	}
+}
+
+func (d *listItemDelegate) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+		{
+			key.NewBinding(
+				key.WithKeys("enter"),
+				key.WithHelp("enter", "view email"),
+			),
+		},
+	}
 }
