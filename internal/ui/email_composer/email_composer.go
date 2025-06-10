@@ -36,14 +36,24 @@ var (
 				Foreground(lipgloss.AdaptiveColor{Light: "#FFFFFF", Dark: "#000000"})
 )
 
+type emailSentMessage struct {
+	error error
+}
+
 type EmailComposerModel struct {
-	backend    core.EmailBackend
+	backend core.EmailBackend
+
+	sending bool
+	error   string
+
 	focusIndex int
-	toInput    textinput.Model
-	subInput   textinput.Model
-	bodyInput  textarea.Model
-	width      int
-	height     int
+
+	toInput   textinput.Model
+	subInput  textinput.Model
+	bodyInput textarea.Model
+
+	width  int
+	height int
 }
 
 func NewEmailComposerModel(backend core.EmailBackend) *EmailComposerModel {
@@ -92,6 +102,17 @@ func (m *EmailComposerModel) Update(msg tea.Msg) (*EmailComposerModel, tea.Cmd) 
 		cmd := m.updateFieldFocus()
 		return m, cmd
 
+	case emailSentMessage:
+		m.sending = false
+		if msg.error != nil {
+			m.error = msg.error.Error()
+		} else {
+			m.error = ""
+			return m, func() tea.Msg {
+				return ui.ShowEmailListMessage{}
+			}
+		}
+
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
@@ -109,10 +130,8 @@ func (m *EmailComposerModel) Update(msg tea.Msg) (*EmailComposerModel, tea.Cmd) 
 
 		case "enter":
 			if m.focusIndex == submitButton {
-				return m, func() tea.Msg {
-					// TODO: send the email
-					return ui.ShowEmailListMessage{}
-				}
+				m.sending = true
+				commands = append(commands, m.sendEmail())
 			}
 		}
 	}
@@ -206,6 +225,14 @@ func (m *EmailComposerModel) updateSizes() {
 }
 
 func (m *EmailComposerModel) View() string {
+	if m.sending {
+		return "Email sending..."
+	}
+
+	if m.error != "" {
+		return "Error sending email: " + m.error
+	}
+
 	var b strings.Builder
 
 	b.WriteString(labelStyle.Render("Compose Email"))
@@ -236,4 +263,17 @@ func (m *EmailComposerModel) View() string {
 	b.WriteString(blurredStyle.Render("Tab/Shift+Tab: Navigate • Enter: Send • Esc: Cancel"))
 
 	return b.String()
+}
+
+func (m *EmailComposerModel) sendEmail() tea.Cmd {
+	return func() tea.Msg {
+		err := m.backend.SendEmail(core.OutgoingEmail{
+			To:      m.toInput.Value(),
+			Subject: m.subInput.Value(),
+			Body:    m.bodyInput.Value(),
+		})
+		return emailSentMessage{
+			error: err,
+		}
+	}
 }

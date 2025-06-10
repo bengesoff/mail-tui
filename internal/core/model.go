@@ -16,3 +16,9 @@ type Email struct {
 	EmailMetadata
 	Body string
 }
+
+type OutgoingEmail struct {
+	To      string
+	Subject string
+	Body    string
+}

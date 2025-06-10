@@ -25,6 +25,10 @@ func (m *mockBackend) GetEmail(id core.EmailId) (*core.Email, error) {
 	return m.email, m.err
 }
 
+func (m *mockBackend) SendEmail(email core.OutgoingEmail) error {
+	return nil
+}
+
 func TestEmailViewerModel_ShowEmailViewerMessage(t *testing.T) {
 	backend := &mockBackend{}
 	model := NewEmailViewerModel(backend)

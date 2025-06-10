@@ -59,3 +59,8 @@ func (b *FakeBackend) GetEmail(id core.EmailId) (*core.Email, error) {
 			"Tester", id),
 	}, nil
 }
+
+func (b *FakeBackend) SendEmail(email core.OutgoingEmail) error {
+	time.Sleep(1 * time.Second)
+	return nil
+}
