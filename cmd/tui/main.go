@@ -3,20 +3,30 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
-	"mail-tui/internal/core"
+	"mail-tui/internal/backend/fake"
+	"mail-tui/internal/ui/email_list"
 	"mail-tui/internal/ui/email_viewer"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+const (
+	ListViewName   = "email_list"
+	ViewerViewName = "email_viewer"
+)
+
 type model struct {
+	activeView  string
 	emailViewer *email_viewer.EmailViewerModel
+	emailList   *email_list.EmailListModel
 }
 
 func (m model) Init() tea.Cmd {
-	return nil
+	return tea.Batch(
+		m.emailList.Init(),
+		m.emailViewer.Init(),
+	)
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -28,39 +38,47 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "ctrl+c":
 			return m, tea.Quit
 		case "l":
 			commands = append(commands, func() tea.Msg {
 				// simulate loading an email
 				return email_viewer.DisplayEmailMessage{
-					Email: &core.Email{
-						From:    "from@example.com",
-						To:      "to@example.com",
-						Subject: "Test email",
-						SentAt:  time.Now(),
-						Body: "To whom it may concern,\n\n" +
-							"This is a test email.\n\n" +
-							"Yours sincerely,\n\n" +
-							"Tester",
-					},
+					EmailId: "1",
 				}
 			})
 		}
+	case email_viewer.DisplayEmailMessage:
+		m.activeView = ViewerViewName
 	}
 
 	m.emailViewer, cmd = m.emailViewer.Update(msg)
+	commands = append(commands, cmd)
+
+	m.emailList, cmd = m.emailList.Update(msg)
 	commands = append(commands, cmd)
 
 	return m, tea.Batch(commands...)
 }
 
 func (m model) View() string {
-	return m.emailViewer.View()
+	switch m.activeView {
+	case ListViewName:
+		return m.emailList.View()
+	case ViewerViewName:
+		return m.emailViewer.View()
+	default:
+		return "Unknown view " + m.activeView
+	}
 }
 
 func initialModel() model {
-	return model{&email_viewer.EmailViewerModel{}}
+	backend := &fake.FakeBackend{}
+	return model{
+		activeView:  ListViewName,
+		emailViewer: email_viewer.NewEmailViewerModel(backend),
+		emailList:   email_list.NewEmailListModel(backend),
+	}
 }
 
 func main() {

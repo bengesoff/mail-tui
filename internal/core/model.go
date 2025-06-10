@@ -2,10 +2,17 @@ package core
 
 import "time"
 
-type Email struct {
+type EmailId string
+
+type EmailMetadata struct {
+	Id      EmailId
 	From    string
 	To      string
 	Subject string
 	SentAt  time.Time
-	Body    string
+}
+
+type Email struct {
+	EmailMetadata
+	Body string
 }
