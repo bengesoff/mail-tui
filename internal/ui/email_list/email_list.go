@@ -1,11 +1,11 @@
 package email_list
 
 import (
-	"mail-tui/internal/core"
-	"mail-tui/internal/ui/email_viewer"
-
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+
+	"github.com/bengesoff/mail-tui/internal/core"
+	"github.com/bengesoff/mail-tui/internal/ui/email_viewer"
 )
 
 type LoadEmailsMessage struct{}

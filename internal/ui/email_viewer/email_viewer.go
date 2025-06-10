@@ -1,10 +1,10 @@
 package email_viewer
 
 import (
-	"mail-tui/internal/core"
-
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+
+	"github.com/bengesoff/mail-tui/internal/core"
 )
 
 type DisplayEmailMessage struct {

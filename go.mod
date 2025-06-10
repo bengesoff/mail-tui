@@ -1,4 +1,4 @@
-module mail-tui
+module github.com/bengesoff/mail-tui
 
 go 1.24
 

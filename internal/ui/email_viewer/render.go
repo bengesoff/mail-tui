@@ -1,12 +1,12 @@
 package email_viewer
 
 import (
-	"mail-tui/internal/core"
-
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
 	"github.com/muesli/reflow/wordwrap"
 	"github.com/muesli/reflow/wrap"
+
+	"github.com/bengesoff/mail-tui/internal/core"
 )
 
 var (

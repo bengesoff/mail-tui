@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"mail-tui/internal/core"
+	"github.com/bengesoff/mail-tui/internal/core"
 )
 
 type FakeBackend struct{}

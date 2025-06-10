@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"mail-tui/internal/backend/fake"
-	"mail-tui/internal/ui/email_list"
-	"mail-tui/internal/ui/email_viewer"
-
 	tea "github.com/charmbracelet/bubbletea"
+
+	"github.com/bengesoff/mail-tui/internal/backend/fake"
+	"github.com/bengesoff/mail-tui/internal/ui/email_list"
+	"github.com/bengesoff/mail-tui/internal/ui/email_viewer"
 )
 
 const (
