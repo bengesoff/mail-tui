@@ -5,10 +5,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/bengesoff/mail-tui/internal/core"
-	"github.com/bengesoff/mail-tui/internal/ui/email_viewer"
+	"github.com/bengesoff/mail-tui/internal/ui"
 )
-
-type LoadEmailsMessage struct{}
 
 type EmailsLoadedMessage struct {
 	Emails []core.EmailMetadata
@@ -34,16 +32,14 @@ func NewEmailListModel(backend core.EmailBackend) *EmailListModel {
 }
 
 func (m *EmailListModel) Init() tea.Cmd {
-	return func() tea.Msg {
-		return LoadEmailsMessage{}
-	}
+	return nil
 }
 
 func (m *EmailListModel) Update(msg tea.Msg) (*EmailListModel, tea.Cmd) {
 	var commands []tea.Cmd
 
 	switch msg := msg.(type) {
-	case LoadEmailsMessage:
+	case ui.ShowEmailListMessage:
 		m.loading = true
 		m.error = ""
 		commands = append(commands, m.loadEmails())
@@ -71,7 +67,7 @@ func (m *EmailListModel) Update(msg tea.Msg) (*EmailListModel, tea.Cmd) {
 			commands = append(commands, func() tea.Msg {
 				i := m.list.GlobalIndex()
 				selectedEmail := m.emails[i]
-				return email_viewer.DisplayEmailMessage{
+				return ui.ShowEmailViewerMessage{
 					EmailId: selectedEmail.Id,
 				}
 			})

@@ -7,6 +7,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"github.com/bengesoff/mail-tui/internal/backend/fake"
+	"github.com/bengesoff/mail-tui/internal/ui"
 	"github.com/bengesoff/mail-tui/internal/ui/email_list"
 	"github.com/bengesoff/mail-tui/internal/ui/email_viewer"
 )
@@ -23,10 +24,9 @@ type model struct {
 }
 
 func (m model) Init() tea.Cmd {
-	return tea.Batch(
-		m.emailList.Init(),
-		m.emailViewer.Init(),
-	)
+	return func() tea.Msg {
+		return ui.ShowEmailListMessage{}
+	}
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -40,23 +40,31 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "ctrl+c":
 			return m, tea.Quit
-		case "l":
-			commands = append(commands, func() tea.Msg {
-				// simulate loading an email
-				return email_viewer.DisplayEmailMessage{
-					EmailId: "1",
-				}
-			})
+		default:
+			// only send key messages to the active view
+			switch m.activeView {
+			case ListViewName:
+				m.emailList, cmd = m.emailList.Update(msg)
+				commands = append(commands, cmd)
+			case ViewerViewName:
+				m.emailViewer, cmd = m.emailViewer.Update(msg)
+				commands = append(commands, cmd)
+			}
 		}
-	case email_viewer.DisplayEmailMessage:
+	case ui.ShowEmailListMessage:
+		m.activeView = ListViewName
+		m.emailList, cmd = m.emailList.Update(msg)
+		commands = append(commands, cmd)
+	case ui.ShowEmailViewerMessage:
 		m.activeView = ViewerViewName
+		m.emailViewer, cmd = m.emailViewer.Update(msg)
+		commands = append(commands, cmd)
+	default:
+		m.emailList, cmd = m.emailList.Update(msg)
+		commands = append(commands, cmd)
+		m.emailViewer, cmd = m.emailViewer.Update(msg)
+		commands = append(commands, cmd)
 	}
-
-	m.emailViewer, cmd = m.emailViewer.Update(msg)
-	commands = append(commands, cmd)
-
-	m.emailList, cmd = m.emailList.Update(msg)
-	commands = append(commands, cmd)
 
 	return m, tea.Batch(commands...)
 }
