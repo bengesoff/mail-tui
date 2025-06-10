@@ -66,5 +66,5 @@ func (d *listItemDelegate) Render(w io.Writer, m list.Model, index int, item lis
 		return
 	}
 
-	fmt.Fprintf(w, style("%s %s\n  %s (%s)"), selected, emailSubjectStyle.Render(email.Subject), email.From, sent)
+	_, _ = fmt.Fprintf(w, style("%s %s\n  %s (%s)"), selected, emailSubjectStyle.Render(email.Subject), email.From, sent)
 }
