@@ -1,15 +1,16 @@
-package main
+package app
 
 import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"github.com/bengesoff/mail-tui/internal/backend/fake"
 	"github.com/bengesoff/mail-tui/internal/ui"
 )
 
 func TestModel_InitialState(t *testing.T) {
-	m := initialModel()
+	m := NewAppModel(&fake.FakeBackend{})
 
 	if m.activeView != ListViewName {
 		t.Errorf("Expected initial view to be '%s', got '%s'", ListViewName, m.activeView)
@@ -25,7 +26,7 @@ func TestModel_InitialState(t *testing.T) {
 }
 
 func TestModel_Init(t *testing.T) {
-	m := initialModel()
+	m := NewAppModel(&fake.FakeBackend{})
 	cmd := m.Init()
 
 	if cmd == nil {
@@ -41,11 +42,11 @@ func TestModel_Init(t *testing.T) {
 }
 
 func TestModel_Update_ShowEmailListMessage(t *testing.T) {
-	m := initialModel()
+	m := NewAppModel(&fake.FakeBackend{})
 	m.activeView = ViewerViewName // Start with viewer view
 
 	updatedModel, _ := m.Update(ui.ShowEmailListMessage{})
-	updated := updatedModel.(model)
+	updated := updatedModel.(AppModel)
 
 	if updated.activeView != ListViewName {
 		t.Errorf("Expected view to be '%s' after ShowEmailListMessage, got '%s'", ListViewName, updated.activeView)
@@ -53,10 +54,10 @@ func TestModel_Update_ShowEmailListMessage(t *testing.T) {
 }
 
 func TestModel_Update_ShowEmailViewerMessage(t *testing.T) {
-	m := initialModel()
+	m := NewAppModel(&fake.FakeBackend{})
 
 	updatedModel, _ := m.Update(ui.ShowEmailViewerMessage{EmailId: "test-id"})
-	updated := updatedModel.(model)
+	updated := updatedModel.(AppModel)
 
 	if updated.activeView != ViewerViewName {
 		t.Errorf("Expected view to be '%s' after ShowEmailViewerMessage, got '%s'", ViewerViewName, updated.activeView)
@@ -64,7 +65,7 @@ func TestModel_Update_ShowEmailViewerMessage(t *testing.T) {
 }
 
 func TestModel_Update_CtrlC(t *testing.T) {
-	m := initialModel()
+	m := NewAppModel(&fake.FakeBackend{})
 
 	keyMsg := tea.KeyMsg{Type: tea.KeyCtrlC}
 	_, cmd := m.Update(keyMsg)
@@ -76,7 +77,7 @@ func TestModel_Update_CtrlC(t *testing.T) {
 }
 
 func TestModel_ViewSwitching_Sequence(t *testing.T) {
-	m := initialModel()
+	m := NewAppModel(&fake.FakeBackend{})
 
 	// Should start with list view
 	if m.activeView != ListViewName {
@@ -84,26 +85,26 @@ func TestModel_ViewSwitching_Sequence(t *testing.T) {
 	}
 
 	// Switch to viewer
-	updatedModel, _ := m.Update(ui.ShowEmailViewerMessage{EmailId: "test"})
-	m = updatedModel.(model)
+	um, _ := m.Update(ui.ShowEmailViewerMessage{EmailId: "test"})
+	updatedModel := um.(AppModel)
 
-	if m.activeView != ViewerViewName {
-		t.Errorf("Expected view to be '%s' after ShowEmailViewerMessage, got '%s'", ViewerViewName, m.activeView)
+	if updatedModel.activeView != ViewerViewName {
+		t.Errorf("Expected view to be '%s' after ShowEmailViewerMessage, got '%s'", ViewerViewName, updatedModel.activeView)
 	}
 
 	// Switch back to list
-	updatedModel, _ = m.Update(ui.ShowEmailListMessage{})
-	m = updatedModel.(model)
+	um, _ = m.Update(ui.ShowEmailListMessage{})
+	updatedModel = um.(AppModel)
 
-	if m.activeView != ListViewName {
-		t.Errorf("Expected view to be '%s' after ShowEmailListMessage, got '%s'", ListViewName, m.activeView)
+	if updatedModel.activeView != ListViewName {
+		t.Errorf("Expected view to be '%s' after ShowEmailListMessage, got '%s'", ListViewName, updatedModel.activeView)
 	}
 
 	// Switch to viewer again
-	updatedModel, _ = m.Update(ui.ShowEmailViewerMessage{EmailId: "another-test"})
-	m = updatedModel.(model)
+	um, _ = m.Update(ui.ShowEmailViewerMessage{EmailId: "another-test"})
+	updatedModel = um.(AppModel)
 
-	if m.activeView != ViewerViewName {
-		t.Errorf("Expected view to be '%s' after second ShowEmailViewerMessage, got '%s'", ViewerViewName, m.activeView)
+	if updatedModel.activeView != ViewerViewName {
+		t.Errorf("Expected view to be '%s' after second ShowEmailViewerMessage, got '%s'", ViewerViewName, updatedModel.activeView)
 	}
 }
