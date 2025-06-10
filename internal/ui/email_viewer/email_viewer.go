@@ -8,9 +8,9 @@ import (
 	"github.com/bengesoff/mail-tui/internal/ui"
 )
 
-type EmailLoadedMessage struct {
-	Email *core.Email
-	Error error
+type emailLoadedMessage struct {
+	email *core.Email
+	error error
 }
 
 type EmailViewerModel struct {
@@ -43,12 +43,12 @@ func (m *EmailViewerModel) Update(msg tea.Msg) (*EmailViewerModel, tea.Cmd) {
 		m.error = ""
 		m.email = nil
 		commands = append(commands, m.loadEmail(msg.EmailId))
-	case EmailLoadedMessage:
+	case emailLoadedMessage:
 		m.loading = false
-		if msg.Error != nil {
-			m.error = msg.Error.Error()
+		if msg.error != nil {
+			m.error = msg.error.Error()
 		} else {
-			m.email = msg.Email
+			m.email = msg.email
 			m.error = ""
 		}
 		err := m.updateViewportContent()
@@ -124,15 +124,15 @@ func (m *EmailViewerModel) loadEmail(emailId core.EmailId) tea.Cmd {
 	return func() tea.Msg {
 		email, err := m.backend.GetEmail(emailId)
 		if err != nil {
-			return EmailLoadedMessage{
-				Email: nil,
-				Error: err,
+			return emailLoadedMessage{
+				email: nil,
+				error: err,
 			}
 		}
 
-		return EmailLoadedMessage{
-			Email: email,
-			Error: nil,
+		return emailLoadedMessage{
+			email: email,
+			error: nil,
 		}
 	}
 }

@@ -65,9 +65,9 @@ func TestEmailViewerModel_EmailLoadedMessage_Success(t *testing.T) {
 		Body: "This is a test email body",
 	}
 
-	updatedModel, _ := model.Update(EmailLoadedMessage{
-		Email: testEmail,
-		Error: nil,
+	updatedModel, _ := model.Update(emailLoadedMessage{
+		email: testEmail,
+		error: nil,
 	})
 
 	if updatedModel.loading {
@@ -94,9 +94,9 @@ func TestEmailViewerModel_EmailLoadedMessage_Error(t *testing.T) {
 
 	testError := errors.New("failed to load email")
 
-	updatedModel, _ := model.Update(EmailLoadedMessage{
-		Email: nil,
-		Error: testError,
+	updatedModel, _ := model.Update(emailLoadedMessage{
+		email: nil,
+		error: testError,
 	})
 
 	if updatedModel.loading {

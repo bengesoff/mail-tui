@@ -8,9 +8,9 @@ import (
 	"github.com/bengesoff/mail-tui/internal/ui"
 )
 
-type EmailsLoadedMessage struct {
-	Emails []core.EmailMetadata
-	Error  error
+type emailsLoadedMessage struct {
+	emails []core.EmailMetadata
+	error  error
 }
 
 type EmailListModel struct {
@@ -43,12 +43,12 @@ func (m *EmailListModel) Update(msg tea.Msg) (*EmailListModel, tea.Cmd) {
 		m.loading = true
 		m.error = ""
 		commands = append(commands, m.loadEmails())
-	case EmailsLoadedMessage:
+	case emailsLoadedMessage:
 		m.loading = false
-		if msg.Error != nil {
-			m.error = msg.Error.Error()
+		if msg.error != nil {
+			m.error = msg.error.Error()
 		} else {
-			m.emails = msg.Emails
+			m.emails = msg.emails
 			m.error = ""
 			var items []list.Item
 			for _, email := range m.emails {
@@ -101,14 +101,14 @@ func (m *EmailListModel) loadEmails() tea.Cmd {
 	return func() tea.Msg {
 		emails, err := m.backend.ListEmails()
 		if err != nil {
-			return EmailsLoadedMessage{
-				Emails: nil,
-				Error:  err,
+			return emailsLoadedMessage{
+				emails: nil,
+				error:  err,
 			}
 		}
-		return EmailsLoadedMessage{
-			Emails: emails,
-			Error:  nil,
+		return emailsLoadedMessage{
+			emails: emails,
+			error:  nil,
 		}
 	}
 }
