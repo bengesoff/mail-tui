@@ -1,9 +1,65 @@
 # `mail-tui`
 
-A minimal terminal-based email client.
+A minimal terminal-based email client using [`bubbletea`](https://github.com/charmbracelet/bubbletea).
 
 Run with:
 
 ```
 $ go run ./cmd/tui
 ```
+
+## Structure
+
+The main entrypoint of the application is in `cmd/tui/main.go`.
+It wires things up and runs the rest of the [`bubbletea`](https://github.com/charmbracelet/bubbletea) app.
+
+I've loosely split up the UI part of the app into components, which are in the `internal/ui` directory.
+So far, this contains the following components:
+- `app`: the root application component, responsible for switching between the other views
+- `email_list`: renders a list of emails
+- `email_viewer`: displays a single email
+- `email_composer`: a form-esque component for composing a new email
+
+The "domain model" is in `internal/core`.
+In here we have some structs representing the email domain.
+There is also the abstract `EmailBackend` interface, to allow the `internal/ui` components to remain decoupled from the underlying email backend implementation.
+Currently I just have a `internal/backend/fake` package to implement this, which returns dummy data.
+
+## Testing
+
+There are unit tests for some of the UI components, but I haven't added tests for all of them.
+They verify that the [`bubbletea`](https://github.com/charmbracelet/bubbletea) components update their state models correctly in response to various messages.
+
+None of the actual happy-path terminal output is currently tested, although [this experimental `teatest` package](https://github.com/charmbracelet/x/tree/main/exp/teatest/v2) could be used to help with this (it essentially does snapshot-based testing).
+
+The tests can be run with:
+
+```
+$ go test ./...
+```
+
+## Future Enhancements
+
+Of course it isn't really usable at this stage, so these are some things I still need to add:
+
+- Real JMAP email backend using the [`go-jmap`](https://git.sr.ht/~rockorager/go-jmap) package
+- An SMTP client for sending emails
+- Add a SQLite database to cache the mailbox data and avoid needing to re-fetch the whole thing each time the app loads
+  - Should also store the query state so we can efficiently request only what has changed since the last time the app ran
+- A background goroutine to subscribe to changes and update the cache accordingly
+- Allow the user to open their `$EDITOR` to compose an email instead of using the built-in form
+- Add config file to `$XDG_CONFIG_HOME/mail-tui/` for storing email account settings
+
+## Non-goals
+
+Things I'm not planning to support, in order to keep things simple:
+
+- Multiple mailboxes or email accounts - you can't see your "Sent" mailbox or configure multiple email accounts
+- Replies and threads - no responding to emails or viewing threads of email responses; each email is standalone
+- Forwarding emails
+- Attachments and HTML-formatted emails - plain-text only
+- Cc/Bcc
+- Drafts
+- Contacts or address book to pre-populate email addresses
+- Email search
+- Real-time UI updates when changes occur
