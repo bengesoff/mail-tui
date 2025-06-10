@@ -71,6 +71,10 @@ func (m *EmailListModel) Update(msg tea.Msg) (*EmailListModel, tea.Cmd) {
 					EmailId: selectedEmail.Id,
 				}
 			})
+		case "c":
+			commands = append(commands, func() tea.Msg {
+				return ui.ShowEmailComposerMessage{}
+			})
 		}
 	}
 

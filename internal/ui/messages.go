@@ -7,3 +7,5 @@ type ShowEmailListMessage struct{}
 type ShowEmailViewerMessage struct {
 	EmailId core.EmailId
 }
+
+type ShowEmailComposerMessage struct{}

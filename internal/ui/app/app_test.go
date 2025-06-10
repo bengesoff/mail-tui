@@ -23,6 +23,10 @@ func TestModel_InitialState(t *testing.T) {
 	if m.emailViewer == nil {
 		t.Error("Expected emailViewer to be initialized")
 	}
+
+	if m.emailComposer == nil {
+		t.Error("Expected emailComposer to be initialized")
+	}
 }
 
 func TestModel_Init(t *testing.T) {
@@ -61,6 +65,17 @@ func TestModel_Update_ShowEmailViewerMessage(t *testing.T) {
 
 	if updated.activeView != ViewerViewName {
 		t.Errorf("Expected view to be '%s' after ShowEmailViewerMessage, got '%s'", ViewerViewName, updated.activeView)
+	}
+}
+
+func TestModel_Update_ShowEmailComposerMessage(t *testing.T) {
+	m := NewAppModel(&fake.FakeBackend{})
+
+	updatedModel, _ := m.Update(ui.ShowEmailComposerMessage{})
+	updated := updatedModel.(AppModel)
+
+	if updated.activeView != ComposerViewName {
+		t.Errorf("Expected view to be '%s' after ShowEmailComposerMessage, got '%s'", ComposerViewName, updated.activeView)
 	}
 }
 
@@ -106,5 +121,21 @@ func TestModel_ViewSwitching_Sequence(t *testing.T) {
 
 	if updatedModel.activeView != ViewerViewName {
 		t.Errorf("Expected view to be '%s' after second ShowEmailViewerMessage, got '%s'", ViewerViewName, updatedModel.activeView)
+	}
+
+	// Switch to composer
+	um, _ = m.Update(ui.ShowEmailComposerMessage{})
+	updatedModel = um.(AppModel)
+
+	if updatedModel.activeView != ComposerViewName {
+		t.Errorf("Expected view to be '%s' after ShowEmailComposerMessage, got '%s'", ComposerViewName, updatedModel.activeView)
+	}
+
+	// Switch back to list from composer
+	um, _ = m.Update(ui.ShowEmailListMessage{})
+	updatedModel = um.(AppModel)
+
+	if updatedModel.activeView != ListViewName {
+		t.Errorf("Expected view to be '%s' after ShowEmailListMessage from composer, got '%s'", ListViewName, updatedModel.activeView)
 	}
 }

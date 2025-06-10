@@ -76,6 +76,10 @@ func (d *listItemDelegate) ShortHelp() []key.Binding {
 			key.WithKeys("enter"),
 			key.WithHelp("enter", "view email"),
 		),
+		key.NewBinding(
+			key.WithKeys("c"),
+			key.WithHelp("c", "compose email"),
+		),
 	}
 }
 
@@ -85,6 +89,10 @@ func (d *listItemDelegate) FullHelp() [][]key.Binding {
 			key.NewBinding(
 				key.WithKeys("enter"),
 				key.WithHelp("enter", "view email"),
+			),
+			key.NewBinding(
+				key.WithKeys("c"),
+				key.WithHelp("c", "compose email"),
 			),
 		},
 	}
