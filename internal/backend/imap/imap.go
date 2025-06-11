@@ -73,10 +73,12 @@ func (b *ImapBackend) GetEmail(id core.EmailId) (*core.Email, error) {
 	}
 
 	message := messages[0]
+	// fairly rudimentary body decoding - will probably break for more complicated multipart messages
+	body := string(message.BodySection[0].Bytes)
 
 	return &core.Email{
 		EmailMetadata: fetchMessageBufferToEmailMetadata(message),
-		Body:          "Body TBC",
+		Body:          body,
 	}, nil
 }
 
