@@ -10,7 +10,7 @@ import (
 )
 
 func TestModel_InitialState(t *testing.T) {
-	m := NewAppModel(&fake.FakeBackend{})
+	m := NewAppModel(fake.NewFakeBackend())
 
 	if m.activeView != ListViewName {
 		t.Errorf("Expected initial view to be '%s', got '%s'", ListViewName, m.activeView)
@@ -30,7 +30,7 @@ func TestModel_InitialState(t *testing.T) {
 }
 
 func TestModel_Init(t *testing.T) {
-	m := NewAppModel(&fake.FakeBackend{})
+	m := NewAppModel(fake.NewFakeBackend())
 	cmd := m.Init()
 
 	if cmd == nil {
@@ -46,7 +46,7 @@ func TestModel_Init(t *testing.T) {
 }
 
 func TestModel_Update_ShowEmailListMessage(t *testing.T) {
-	m := NewAppModel(&fake.FakeBackend{})
+	m := NewAppModel(fake.NewFakeBackend())
 	m.activeView = ViewerViewName // Start with viewer view
 
 	updatedModel, _ := m.Update(ui.ShowEmailListMessage{})
@@ -58,7 +58,7 @@ func TestModel_Update_ShowEmailListMessage(t *testing.T) {
 }
 
 func TestModel_Update_ShowEmailViewerMessage(t *testing.T) {
-	m := NewAppModel(&fake.FakeBackend{})
+	m := NewAppModel(fake.NewFakeBackend())
 
 	updatedModel, _ := m.Update(ui.ShowEmailViewerMessage{EmailId: "test-id"})
 	updated := updatedModel.(AppModel)
@@ -69,7 +69,7 @@ func TestModel_Update_ShowEmailViewerMessage(t *testing.T) {
 }
 
 func TestModel_Update_ShowEmailComposerMessage(t *testing.T) {
-	m := NewAppModel(&fake.FakeBackend{})
+	m := NewAppModel(fake.NewFakeBackend())
 
 	updatedModel, _ := m.Update(ui.ShowEmailComposerMessage{})
 	updated := updatedModel.(AppModel)
@@ -80,7 +80,7 @@ func TestModel_Update_ShowEmailComposerMessage(t *testing.T) {
 }
 
 func TestModel_Update_CtrlC(t *testing.T) {
-	m := NewAppModel(&fake.FakeBackend{})
+	m := NewAppModel(fake.NewFakeBackend())
 
 	keyMsg := tea.KeyMsg{Type: tea.KeyCtrlC}
 	_, cmd := m.Update(keyMsg)
@@ -92,7 +92,7 @@ func TestModel_Update_CtrlC(t *testing.T) {
 }
 
 func TestModel_ViewSwitching_Sequence(t *testing.T) {
-	m := NewAppModel(&fake.FakeBackend{})
+	m := NewAppModel(fake.NewFakeBackend())
 
 	// Should start with list view
 	if m.activeView != ListViewName {

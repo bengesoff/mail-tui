@@ -10,6 +10,7 @@ type EmailMetadata struct {
 	To      string
 	Subject string
 	SentAt  time.Time
+	IsRead  bool
 }
 
 type Email struct {

@@ -13,6 +13,10 @@ type emailLoadedMessage struct {
 	error error
 }
 
+type emailMarkedReadMessage struct {
+	error error
+}
+
 type EmailViewerModel struct {
 	email   *core.Email
 	backend core.EmailBackend
@@ -50,11 +54,16 @@ func (m *EmailViewerModel) Update(msg tea.Msg) (*EmailViewerModel, tea.Cmd) {
 		} else {
 			m.email = msg.email
 			m.error = ""
+			commands = append(commands, m.markAsRead(msg.email.Id))
 		}
 		err := m.updateViewportContent()
 		if err != nil {
 			m.error = err.Error()
 			return m, nil
+		}
+	case emailMarkedReadMessage:
+		if msg.error != nil {
+			m.error = "error marking email as read: " + msg.error.Error()
 		}
 	case tea.WindowSizeMsg:
 		if !m.ready {
@@ -133,6 +142,15 @@ func (m *EmailViewerModel) loadEmail(emailId core.EmailId) tea.Cmd {
 		return emailLoadedMessage{
 			email: email,
 			error: nil,
+		}
+	}
+}
+
+func (m *EmailViewerModel) markAsRead(emailId core.EmailId) tea.Cmd {
+	return func() tea.Msg {
+		err := m.backend.MarkAsRead(emailId)
+		return emailMarkedReadMessage{
+			error: err,
 		}
 	}
 }

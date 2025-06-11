@@ -17,7 +17,7 @@ var (
 				Bold(true)
 
 	normalStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#1a1a1a", Dark: "#dddddd"}).
+			Foreground(lipgloss.AdaptiveColor{Light: "#555555", Dark: "#bbbbbb"}).
 			Padding(0, 0, 0, 2)
 
 	selectedStyle = lipgloss.NewStyle().
@@ -25,6 +25,16 @@ var (
 			BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
 			Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}).
 			Padding(0, 0, 0, 1)
+
+	unreadStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.AdaptiveColor{Light: "#000000", Dark: "#ffffff"}).
+			Padding(0, 0, 0, 2)
+
+	selectedUnreadStyle = lipgloss.NewStyle().
+				Border(lipgloss.NormalBorder(), false, false, false, true).
+				BorderForeground(lipgloss.AdaptiveColor{Light: "#F793FF", Dark: "#AD58B4"}).
+				Foreground(lipgloss.AdaptiveColor{Light: "#EE6FF8", Dark: "#EE6FF8"}).
+				Padding(0, 0, 0, 1)
 )
 
 type emailListItem struct {
@@ -55,11 +65,26 @@ func (d *listItemDelegate) Render(w io.Writer, m list.Model, index int, item lis
 		return
 	}
 
-	selected := " "
+	unread := !email.IsRead
+	selected := index == m.Index()
+
+	unreadIndicator := " "
+	if unread {
+		unreadIndicator = "●"
+	}
+
+	selectedIndicator := " "
+	if selected {
+		selectedIndicator = ">"
+	}
+
 	style := normalStyle.Render
-	if index == m.Index() {
-		selected = ">"
+	if selected && unread {
+		style = selectedUnreadStyle.Render
+	} else if selected && !unread {
 		style = selectedStyle.Render
+	} else if !selected && unread {
+		style = unreadStyle.Render
 	}
 
 	sent, err := email.SentAt.MarshalText()
@@ -67,7 +92,13 @@ func (d *listItemDelegate) Render(w io.Writer, m list.Model, index int, item lis
 		return
 	}
 
-	_, _ = fmt.Fprintf(w, style("%s %s\n  %s (%s)"), selected, emailSubjectStyle.Render(email.Subject), email.From, sent)
+	_, _ = fmt.Fprintf(w, style("%s%s %s\n   %s (%s)"),
+		selectedIndicator,
+		unreadIndicator,
+		emailSubjectStyle.Render(email.Subject),
+		email.From,
+		sent,
+	)
 }
 
 func (d *listItemDelegate) ShortHelp() []key.Binding {

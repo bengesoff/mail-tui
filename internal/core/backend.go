@@ -4,4 +4,5 @@ type EmailBackend interface {
 	ListEmails() ([]EmailMetadata, error)
 	GetEmail(id EmailId) (*Email, error)
 	SendEmail(email OutgoingEmail) error
+	MarkAsRead(id EmailId) error
 }

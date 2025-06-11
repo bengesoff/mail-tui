@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	backend := &fake.FakeBackend{}
+	backend := fake.NewFakeBackend()
 	appModel := app.NewAppModel(backend)
 
 	program := tea.NewProgram(

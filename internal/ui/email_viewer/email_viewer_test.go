@@ -29,6 +29,10 @@ func (m *mockBackend) SendEmail(email core.OutgoingEmail) error {
 	return nil
 }
 
+func (m *mockBackend) MarkAsRead(id core.EmailId) error {
+	return nil
+}
+
 func TestEmailViewerModel_ShowEmailViewerMessage(t *testing.T) {
 	backend := &mockBackend{}
 	model := NewEmailViewerModel(backend)
