@@ -31,6 +31,7 @@ func main() {
 
 	var backend core.EmailBackend
 	if flags.useImap {
+		// could also be initialised inside the bubbletea program in order to display a loading spinner
 		imapBackend, err := imap.NewImapBackend(flags.imapAddress, flags.username, flags.password)
 		if err != nil {
 			fmt.Printf("failed to create IMAP backend: %v\n", err)

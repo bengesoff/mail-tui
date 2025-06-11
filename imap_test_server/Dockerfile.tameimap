@@ -1,0 +1,16 @@
+FROM golang:1.24-alpine
+
+RUN apk add --no-cache git
+
+# clone and build tameimap
+# yes, yes, it should be a multi-stage build, but this is just for some quick testing
+WORKDIR /app
+RUN git clone --revision=d3065ffd8c9bc17e38712bbcfc4f039f56159469 --depth=1 https://github.com/bcampbell/tameimap.git
+WORKDIR /app/tameimap
+RUN go build -o tameimap .
+
+COPY dummy_emails/** bob/INBOX/
+
+# `-v` for verbose output, to enable extra logging
+# `-d -` to dump network traffic to stdout
+CMD ["./tameimap", "-d", "-", "-v"]

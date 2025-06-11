@@ -81,9 +81,9 @@ func (b *ImapBackend) GetEmail(id core.EmailId) (*core.Email, error) {
 }
 
 // SendEmail does nothing currently.
-// It needs an SMTP client to be added.
 func (b *ImapBackend) SendEmail(email core.OutgoingEmail) error {
 	time.Sleep(1 * time.Second)
+	// should use net/smtp to send the message somewhere
 	return nil
 }
 
