@@ -1,11 +1,18 @@
 # `mail-tui`
 
-A minimal terminal-based email client using [`bubbletea`](https://github.com/charmbracelet/bubbletea).
+A minimal terminal-based email client using [`bubbletea`](https://github.com/charmbracelet/bubbletea), loading emails over IMAP or via a fake backend with dummy data.
 
-Run with:
+Run it with the following command, replacing the address and credentials as necessary.
+Note that only insecure mode is supported currently.
 
 ```
-$ go run ./cmd/tui
+$ go run ./cmd/tui --imap-address="localhost:1143" --username="user" --password="password"
+```
+
+It can also be run using a fake backend, which displays dummy data instead of connecting to an IMAP server.
+
+```
+$ go run ./cmd/tui --use-imap=false
 ```
 
 ## Structure
@@ -23,7 +30,9 @@ So far, this contains the following components:
 The "domain model" is in `internal/core`.
 In here we have some structs representing the email domain.
 There is also the abstract `EmailBackend` interface, to allow the `internal/ui` components to remain decoupled from the underlying email backend implementation.
-Currently I just have a `internal/backend/fake` package to implement this, which returns dummy data.
+This has 2 implementations:
+- `internal/backend/fake`: returns dummy data
+- `internal/backend/imap`: connects to an IMAP server insecurely
 
 ## Testing
 
@@ -40,15 +49,15 @@ $ go test ./...
 
 ## Future Enhancements
 
-Of course it isn't really usable at this stage, so these are some things I still need to add:
+Of course it isn't really usable at this stage, so these are some things I could still add:
 
-- Real JMAP email backend using the [`go-jmap`](https://git.sr.ht/~rockorager/go-jmap) package
 - An SMTP client for sending emails
 - Add a SQLite database to cache the mailbox data and avoid needing to re-fetch the whole thing each time the app loads
   - Should also store the query state so we can efficiently request only what has changed since the last time the app ran
 - A background goroutine to subscribe to changes and update the cache accordingly
 - Allow the user to open their `$EDITOR` to compose an email instead of using the built-in form
 - Add config file to `$XDG_CONFIG_HOME/mail-tui/` for storing email account settings
+  - Also need to consider how to pass in secrets securely
 
 ## Non-goals
 
