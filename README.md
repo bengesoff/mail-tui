@@ -1,5 +1,7 @@
 # `mail-tui`
 
+![A quick screen recording of the application in use to demonstrate its features](demo.gif)
+
 A minimal terminal-based email client using [`bubbletea`](https://github.com/charmbracelet/bubbletea), loading emails over IMAP or via a fake backend with dummy data.
 
 Run it with the following command, replacing the address and credentials as necessary.
