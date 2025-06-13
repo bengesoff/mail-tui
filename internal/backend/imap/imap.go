@@ -42,6 +42,7 @@ func (b *ImapBackend) ListEmails() ([]core.EmailMetadata, error) {
 	sequenceSet.AddRange(1, 0)
 	messages, err := b.client.Fetch(sequenceSet, &imap.FetchOptions{
 		Envelope: true,
+		Flags:    true,
 	}).Collect()
 	if err != nil {
 		return nil, err
