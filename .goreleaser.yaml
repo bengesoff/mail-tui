@@ -1,0 +1,6 @@
+version: 2
+project_name: mail-tui
+builds:
+  - targets: [go_first_class]
+    main: "./cmd/tui"
+
